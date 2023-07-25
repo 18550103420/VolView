@@ -67,11 +67,14 @@
                       <div v-if="!saveUrl">
                         Secure: Image data never leaves your machine.
                       </div>
-
-                      <div v-if="showErrorReporting" class="vertical-offset-margin">
-                        Opt out of error reporting:
-                        <v-btn icon="mdi-cog" @click.stop="settingsDialog = true" density="comfortable" />
-                      </div>
+                      <v-btn
+                        class="mt-2"
+                        variant="tonal"
+                        color="secondary"
+                        @click.stop="dataSecurityDialog = true"
+                      >
+                        Learn More
+                      </v-btn>
                     </v-card>
                   </v-row>
                 </v-col>
@@ -80,23 +83,27 @@
           </div>
         </v-main>
 
-        <v-dialog v-model="aboutBoxDialog" :width="mobile ? '100%' : '80%'">
-          <about-box @close="aboutBoxDialog = false" />
-        </v-dialog>
+        <closeable-dialog v-model="aboutBoxDialog">
+          <about-box />
+        </closeable-dialog>
 
-        <v-dialog v-model="messageDialog" :width="mobile ? '100%' : '75%'" content-class="fill-height">
-          <message-center @close="messageDialog = false" />
-        </v-dialog>
+        <closeable-dialog v-model="messageDialog" content-class="fill-height">
+          <message-center />
+        </closeable-dialog>
 
         <message-notifications @open-notifications="messageDialog = true" />
 
-        <v-dialog v-model="settingsDialog" :width="mobile ? '100%' : '50%'">
-          <settings @close="settingsDialog = false" v-if="settingsDialog" />
-        </v-dialog>
+        <closeable-dialog v-model="settingsDialog">
+          <settings />
+        </closeable-dialog>
 
-        <v-dialog v-model="saveDialog" :width="mobile ? '100%' : '30%'">
-          <save-session @close="saveDialog = false" />
-        </v-dialog>
+        <closeable-dialog v-model="saveDialog" max-width="30%">
+          <save-session />
+        </closeable-dialog>
+
+        <closeable-dialog v-model="dataSecurityDialog">
+          <data-security-box />
+        </closeable-dialog>
       </v-app>
       <persistent-overlay :disabled="!dragHover" color="#000" :opacity="0.3" :z-index="2000" class="text-center">
         <div class="d-flex flex-column align-center justify-center h-100">
@@ -138,12 +145,14 @@ import ToolButton from './ToolButton.vue';
 import LayoutGrid from './LayoutGrid.vue';
 import ModulePanel from './ModulePanel.vue';
 import DragAndDrop from './DragAndDrop.vue';
+import CloseableDialog from './CloseableDialog.vue';
 import AboutBox from './AboutBox.vue';
 import ToolStrip from './ToolStrip.vue';
 import MessageCenter from './MessageCenter.vue';
 import MessageNotifications from './MessageNotifications.vue';
 import Settings from './Settings.vue';
 import PersistentOverlay from './PersistentOverlay.vue';
+import DataSecurityBox from './DataSecurityBox.vue';
 import VolViewFullLogo from './icons/VolViewFullLogo.vue';
 import VolViewLogo from './icons/VolViewLogo.vue';
 import {
@@ -164,10 +173,10 @@ import { useAppLoadingNotifications } from '../composables/useAppLoadingNotifica
 import { partition } from '../utils';
 // import { partition, wrapInArray } from '../utils';
 import { useKeyboardShortcuts } from '../composables/useKeyboardShortcuts';
-import {
-  useErrorReporting,
-  errorReportingConfigured,
-} from '../utils/errorReporting';
+// import {
+//   useErrorReporting,
+//   errorReportingConfigured,
+// } from '../utils/errorReporting';
 // import { resolveBaseUrl } from 'vite';
 import { InputJsondata } from '../types/inputJson'
 
@@ -274,7 +283,9 @@ export default defineComponent({
     ToolButton,
     LayoutGrid,
     DragAndDrop,
+    CloseableDialog,
     AboutBox,
+    DataSecurityBox,
     ToolStrip,
     ModulePanel,
     MessageCenter,
@@ -441,15 +452,11 @@ export default defineComponent({
 
     const display = useDisplay();
 
-    const errorReportingStore = useErrorReporting();
-    const showErrorReporting = computed(() => {
-      return errorReportingConfigured && !errorReportingStore.disableReporting;
-    });
-
     return {
       aboutBoxDialog: ref(false),
       messageDialog: ref(false),
       settingsDialog: ref(false),
+      dataSecurityDialog: ref(false),
       saveDialog,
       handleSave,
       saveHappening,
@@ -463,7 +470,6 @@ export default defineComponent({
       userPromptFiles,
       openFiles,
       hasData,
-      showErrorReporting,
       saveUrl,
     };
   },
