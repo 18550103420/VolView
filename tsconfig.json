@@ -32,7 +32,8 @@
       "dom.iterable",
       "scripthost",
       "WebWorker"
-    ]
+    ],
+    "outDir": "build"
   },
   "include": [
     "src/**/*.ts",

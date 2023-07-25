@@ -37,6 +37,7 @@ async function itkReader(file: File) {
 export function registerAllReaders(readerMap: FileReaderMap) {
   readerMap.set('application/vnd.unknown.vti', vtiReader);
   readerMap.set('application/vnd.unknown.vtp', vtpReader);
+  readerMap.set('application/gzip', itkReader);
   readerMap.set('model/stl', stlReader);
 
   ITK_IMAGE_MIME_TYPES.forEach((mime) => {

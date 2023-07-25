@@ -15,73 +15,30 @@
       -->
       <v-row no-gutters align="center">
         <v-col>
-          <v-slider
-            :model-value="brushSize"
-            @update:model-value="setBrushSize"
-            density="compact"
-            hide-details
-            label="Size"
-            min="1"
-            max="50"
-          >
+          <v-slider :model-value="brushSize" @update:model-value="setBrushSize" density="compact" hide-details
+            label="Size" min="1" max="50">
             <template v-slot:append>
-              <v-text-field
-                :model-value="brushSize"
-                @input="setBrushSize"
-                variant="underlined"
-                class="mt-n1 pt-0"
-                style="width: 40px"
-                hide-details
-                type="number"
-                min="1"
-                max="50"
-              />
+              <v-text-field :model-value="brushSize" @input="setBrushSize" variant="underlined" class="mt-n1 pt-0"
+                style="width: 40px" hide-details type="number" min="1" max="50" />
             </template>
           </v-slider>
         </v-col>
       </v-row>
       <v-row no-gutters align="center">
         <v-col>
-          <v-slider
-            :model-value="opacity"
-            @update:model-value="setOpacity"
-            density="compact"
-            hide-details
-            label="Opacity"
-            min="0"
-            max="1"
-            step="0.01"
-          >
+          <v-slider :model-value="opacity" @update:model-value="setOpacity" density="compact" hide-details label="Opacity"
+            min="0" max="1" step="0.01">
             <template v-slot:append>
-              <v-text-field
-                :model-value="opacity"
-                @input="setOpacity"
-                variant="underlined"
-                class="mt-n1 pt-0"
-                style="width: 40px"
-                hide-details
-                type="number"
-                min="0"
-                max="1"
-                step="0.1"
-              />
+              <v-text-field :model-value="opacity" @input="setOpacity" variant="underlined" class="mt-n1 pt-0"
+                style="width: 40px" hide-details type="number" min="0" max="1" step="0.1" />
             </template>
           </v-slider>
         </v-col>
       </v-row>
       <v-row no-gutters align="center">
         <v-col>
-          <v-color-picker
-            hide-canvas
-            hide-inputs
-            hide-mode-switch
-            hide-sliders
-            show-swatches
-            elevation="0"
-            :swatches="swatches"
-            :model-value="brushColor"
-            @update:model-value="setBrushColor"
-          />
+          <v-color-picker hide-canvas hide-inputs hide-mode-switch hide-sliders show-swatches elevation="0"
+            :swatches="swatches" :model-value="brushColor" @update:model-value="setBrushColor" />
         </v-col>
       </v-row>
     </v-container>
@@ -134,7 +91,11 @@ export default defineComponent({
     });
 
     const setBrushColor = (color: string) => {
-      const hexa = `${color}FF`.toUpperCase();
+      let hexa = '#00000000'; // eraser
+      if (hexa !== color){
+        hexa = `${color}FF`.toUpperCase()
+      }
+      // const hexa = `${color}FF`.toUpperCase();
       if (hexa in hexToValue) {
         paintStore.setBrushValue(hexToValue[hexa]);
       }

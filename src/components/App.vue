@@ -3,77 +3,34 @@
     <template v-slot="{ dragHover }">
       <v-app>
         <v-app-bar app clipped-left :height="48">
-          <v-btn
-            v-if="mobile"
-            icon="mdi-menu"
-            @click="leftSideBar = !leftSideBar"
-          />
+          <v-btn v-if="mobile" icon="mdi-menu" @click="leftSideBar = !leftSideBar" />
           <v-toolbar-title class="d-flex flex-row align-center mt-3">
             <vol-view-logo v-if="mobile" />
             <vol-view-full-logo v-else />
           </v-toolbar-title>
-          <v-btn
-            variant="text"
-            icon="mdi-help-circle-outline"
-            :rounded="0"
-            class="toolbar-button"
-            @click="aboutBoxDialog = !aboutBoxDialog"
-          />
+          <v-btn variant="text" icon="mdi-help-circle-outline" :rounded="0" class="toolbar-button"
+            @click="aboutBoxDialog = !aboutBoxDialog" />
         </v-app-bar>
-        <v-navigation-drawer
-          v-model="leftSideBar"
-          app
-          clipped
-          touchless
-          width="450"
-          id="left-nav"
-        >
+        <v-navigation-drawer v-model="leftSideBar" app clipped touchless width="450" id="left-nav">
           <module-panel @close="leftSideBar = false" />
         </v-navigation-drawer>
         <v-main id="content-main">
           <div class="fill-height d-flex flex-row flex-grow-1">
-            <div
-              id="tools-strip"
-              class="bg-grey-darken-4 d-flex flex-column align-center"
-            >
-              <tool-button
-                size="40"
-                icon="mdi-folder-open"
-                name="Open files"
-                @click="userPromptFiles"
-              />
-              <tool-button
-                size="40"
-                icon="mdi-content-save-all"
-                name="Save session"
-                :loading="saveHappening"
-                @click="handleSave"
-              />
+            <div id="tools-strip" class="bg-grey-darken-4 d-flex flex-column align-center">
+              <tool-button size="40" icon="mdi-folder-open" name="Open files" @click="userPromptFiles" />
+              <tool-button size="40" icon="mdi-content-save-all" name="Save session" :loading="saveHappening"
+                @click="handleSave" />
               <div class="my-1 tool-separator" />
               <v-menu location="right" :close-on-content-click="false">
                 <template v-slot:activator="{ props }">
                   <div>
-                    <tool-button
-                      v-bind="props"
-                      size="40"
-                      icon="mdi-view-dashboard"
-                      name="Layouts"
-                    />
+                    <tool-button v-bind="props" size="40" icon="mdi-view-dashboard" name="Layouts" />
                   </div>
                 </template>
                 <v-card>
                   <v-card-text>
-                    <v-radio-group
-                      v-model="layoutName"
-                      class="mt-0"
-                      hide-details
-                    >
-                      <v-radio
-                        v-for="(value, key) in Layouts"
-                        :key="key"
-                        :label="value.name"
-                        :value="key"
-                      />
+                    <v-radio-group v-model="layoutName" class="mt-0" hide-details>
+                      <v-radio v-for="(value, key) in Layouts" :key="key" :label="value.name" :value="key" />
                     </v-radio-group>
                   </v-card-text>
                 </v-card>
@@ -82,44 +39,19 @@
                 <tool-strip />
               </template>
               <v-spacer />
-              <v-badge
-                offset-x="10"
-                offset-y="10"
-                :content="messageCount"
-                :color="messageBadgeColor"
-                :model-value="messageCount > 0"
-              >
-                <tool-button
-                  size="40"
-                  icon="mdi-bell-outline"
-                  name="Notifications"
-                  @click="messageDialog = true"
-                />
+              <v-badge offset-x="10" offset-y="10" :content="messageCount" :color="messageBadgeColor"
+                :model-value="messageCount > 0">
+                <tool-button size="40" icon="mdi-bell-outline" name="Notifications" @click="messageDialog = true" />
               </v-badge>
-              <tool-button
-                size="40"
-                icon="mdi-cog"
-                name="Settings"
-                @click="settingsDialog = true"
-              />
+              <tool-button size="40" icon="mdi-cog" name="Settings" @click="settingsDialog = true" />
             </div>
             <div class="d-flex flex-column flex-grow-1">
               <layout-grid v-show="hasData" :layout="currentLayout" />
-              <v-row
-                v-show="!hasData"
-                no-gutters
-                align="center"
-                class="clickable bg-grey-darken-3"
-                @click="userPromptFiles"
-              >
+              <v-row v-show="!hasData" no-gutters align="center" class="clickable bg-grey-darken-3"
+                @click="userPromptFiles">
                 <v-col>
                   <v-row justify="center">
-                    <v-card
-                      flat
-                      dark
-                      color="transparent"
-                      class="text-center headline"
-                    >
+                    <v-card flat dark color="transparent" class="text-center headline">
                       <div>
                         <v-icon size="64">mdi-folder-open</v-icon>
                       </div>
@@ -136,16 +68,9 @@
                         Secure: Image data never leaves your machine.
                       </div>
 
-                      <div
-                        v-if="showErrorReporting"
-                        class="vertical-offset-margin"
-                      >
+                      <div v-if="showErrorReporting" class="vertical-offset-margin">
                         Opt out of error reporting:
-                        <v-btn
-                          icon="mdi-cog"
-                          @click.stop="settingsDialog = true"
-                          density="comfortable"
-                        />
+                        <v-btn icon="mdi-cog" @click.stop="settingsDialog = true" density="comfortable" />
                       </div>
                     </v-card>
                   </v-row>
@@ -159,11 +84,7 @@
           <about-box @close="aboutBoxDialog = false" />
         </v-dialog>
 
-        <v-dialog
-          v-model="messageDialog"
-          :width="mobile ? '100%' : '75%'"
-          content-class="fill-height"
-        >
+        <v-dialog v-model="messageDialog" :width="mobile ? '100%' : '75%'" content-class="fill-height">
           <message-center @close="messageDialog = false" />
         </v-dialog>
 
@@ -177,13 +98,7 @@
           <save-session @close="saveDialog = false" />
         </v-dialog>
       </v-app>
-      <persistent-overlay
-        :disabled="!dragHover"
-        color="#000"
-        :opacity="0.3"
-        :z-index="2000"
-        class="text-center"
-      >
+      <persistent-overlay :disabled="!dragHover" color="#000" :opacity="0.3" :z-index="2000" class="text-center">
         <div class="d-flex flex-column align-center justify-center h-100">
           <div class="dnd-prompt">
             <v-icon size="4.75rem">mdi-download</v-icon>
@@ -208,10 +123,10 @@ import {
 import { storeToRefs } from 'pinia';
 import { UrlParams } from '@vueuse/core';
 import vtkURLExtract from '@kitware/vtk.js/Common/Core/URLExtract';
-import { URL } from 'whatwg-url';
+// import { URL } from 'whatwg-url';
 import { useDisplay } from 'vuetify';
 
-import { basename } from '@/src/utils/path';
+// import { basename } from '@/src/utils/path';
 import { useDatasetStore } from '@/src/store/datasets';
 import { logError } from '@/src/utils/loggers';
 import {
@@ -246,12 +161,15 @@ import SaveSession from './SaveSession.vue';
 import { useGlobalErrorHook } from '../composables/useGlobalErrorHook';
 import { useWebGLWatchdog } from '../composables/useWebGLWatchdog';
 import { useAppLoadingNotifications } from '../composables/useAppLoadingNotifications';
-import { partition, wrapInArray } from '../utils';
+import { partition } from '../utils';
+// import { partition, wrapInArray } from '../utils';
 import { useKeyboardShortcuts } from '../composables/useKeyboardShortcuts';
 import {
   useErrorReporting,
   errorReportingConfigured,
 } from '../utils/errorReporting';
+// import { resolveBaseUrl } from 'vite';
+import { InputJsondata } from '../types/inputJson'
 
 async function loadFiles(
   sources: DataSource[],
@@ -294,20 +212,59 @@ async function loadFiles(
   }
 }
 
+// async function loadRemoteFilesFromURLParams(
+//   params: UrlParams,
+//   setError: (err: Error) => void
+// ) {
+//   const urls = wrapInArray(params.urls);
+//   const names = wrapInArray(params.names ?? []); // optional names should resolve to [] if params.names === undefined
+//   const sources = urls.map((url, idx) =>
+//     uriToDataSource(
+//       url,
+//       names[idx] || basename(new URL(url, window.location.href).pathname) || url
+//     )
+//   );
+
+//   await loadFiles(sources, setError);
+// }
+
 async function loadRemoteFilesFromURLParams(
-  params: UrlParams,
+  url: string,
   setError: (err: Error) => void
 ) {
-  const urls = wrapInArray(params.urls);
-  const names = wrapInArray(params.names ?? []); // optional names should resolve to [] if params.names === undefined
-  const sources = urls.map((url, idx) =>
-    uriToDataSource(
-      url,
-      names[idx] || basename(new URL(url, window.location.href).pathname) || url
-    )
-  );
+  try {
+    fetch(url).then((response) => {
+      if (response.status === 200) {
+        return response.json();
+      }
+      const failedError = new Error(
+        `RemoteFiles failed to load:${response.status}`
+      );
+      return setError(failedError);
+    }).then((remoteJson: Array<InputJsondata>) => {
+      remoteJson.forEach(async (remoteData: InputJsondata) => {
+        // console.log(remoteData)
+        const type = remoteData.Type.split(';');
+        const fileExt = type[0];
+        // const fileType = type[1];
 
-  await loadFiles(sources, setError);
+        const sources = remoteData.Url.map((u, idx) => {
+          let fname = remoteData.Description;
+
+          if (fileExt === 'dcm') {
+            fname += ` - ${idx + 1}.${fileExt}`;
+          }
+          return uriToDataSource(u, fname);
+        });
+        await loadFiles(sources, setError);
+      });
+    });
+  } catch (err) {
+    const failedError = new Error(
+      `RemoteFiles failed to load:${err}`
+    );
+    setError(failedError);
+  }
 }
 
 export default defineComponent({
@@ -388,20 +345,39 @@ export default defineComponent({
     }
 
     // --- parse URL -- //
+    function getInputUrl() {
+      const url = window.location.toString();
+      const arrObj = url.split('?');
+      if (arrObj.length > 1) {
+        let inputUrl = '';
+        for (let i = 1; i < arrObj.length; i++) {
+          if (i > 1) {
+            inputUrl += '?';
+          }
+          inputUrl += arrObj[i];
+        }
+        return inputUrl;
+      }
+      return '';
+    }
 
     const urlParams = vtkURLExtract.extractURLParameters() as UrlParams;
+    const inputJsonUrl = decodeURIComponent(getInputUrl());
 
     onMounted(() => {
-      if (!urlParams.urls) {
+      if (!urlParams.urls && !(inputJsonUrl.length > 0)) {
         return;
       }
+
+      console.log(`RemoteUrl:`, inputJsonUrl);
 
       // TODO remove this nextTick when we switch away from
       // vue-toastification.
       // We run in nextTick to ensure the library is mounted.
       nextTick(() => {
         runAsLoading((setError) =>
-          loadRemoteFilesFromURLParams(urlParams, setError)
+          loadRemoteFilesFromURLParams(inputJsonUrl, setError)
+          // loadRemoteFilesFromURLParams(urlParams, setError)
         );
       });
     });
@@ -507,7 +483,7 @@ export default defineComponent({
   border-right: 1px solid rgb(var(--v-theme-background));
 }
 
-#content-main > .v-content__wrap {
+#content-main>.v-content__wrap {
   display: flex;
 }
 
@@ -516,7 +492,7 @@ export default defineComponent({
   margin-top: 15px;
 }
 
-.alert > .v-snack__wrapper {
+.alert>.v-snack__wrapper {
   /* transition background color */
   transition: background-color 0.25s;
 }
@@ -536,7 +512,8 @@ export default defineComponent({
 }
 
 .toolbar-button {
-  min-height: 100%; /* fill toolbar height */
+  min-height: 100%;
+  /* fill toolbar height */
 }
 
 .tool-separator {
