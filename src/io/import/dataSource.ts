@@ -9,6 +9,7 @@ import { Maybe } from '@/src/types';
 export interface UriSource {
   uri: string;
   name: string;
+  encrypted: boolean;
 }
 
 /**
@@ -81,10 +82,11 @@ export const fileToDataSource = (file: File): DataSource => ({
  * @param uri
  * @returns
  */
-export const uriToDataSource = (uri: string, name: string): DataSource => ({
+export const uriToDataSource = (uri: string, name: string, encrypted: boolean = false): DataSource => ({
   uriSrc: {
     uri,
     name,
+    encrypted,
   },
 });
 

@@ -9,7 +9,8 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 import replace from '@rollup/plugin-replace';
 
-import pkgLock from './package-lock.json';
+import pkgLock from './package.json';
+// import pkgLock from './package-lock.json';
 
 function resolve(...args) {
   return normalizePath(resolvePath(...args));
@@ -122,6 +123,13 @@ export default defineConfig({
     createHtmlPlugin({
       minify: true,
       template: 'index.html',
+
+      inject: {
+        data: {
+          title: 'index',
+          injectScript: `<script src="./wasm/wasm_exec.js"></script>`
+        }
+      }
     }),
     viteStaticCopy({
       targets: [
@@ -151,6 +159,21 @@ export default defineConfig({
           src: 'src/io/resample/emscripten-build/**/resample*',
           dest: 'itk/pipelines',
         },
+        // aestools
+        {
+          src: resolve(
+            nodeModulesDir,
+            '@ruanwenfeng/aestool/lib/wasm/wasm_exec.js'
+          ),
+          dest: 'wasm',
+        },
+        // {
+        //   src: resolve(
+        //     nodeModulesDir,
+        //     '@ruanwenfeng/aestool/lib/wasm/aes.wasm'
+        //   ),
+        //   dest: 'wasm',
+        // }
       ],
     }),
     ANALYZE_BUNDLE

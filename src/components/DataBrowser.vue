@@ -4,7 +4,7 @@ import SampleDataBrowser from './SampleDataBrowser.vue';
 import { useDicomWebStore } from '../store/dicom-web/dicom-web-store';
 import ImageDataBrowser from './ImageDataBrowser.vue';
 import PatientBrowser from './PatientBrowser.vue';
-import PatientList from './dicom-web/PatientList.vue';
+// import PatientList from './dicom-web/PatientList.vue';
 import { useDICOMStore } from '../store/datasets-dicom';
 import { useImageStore } from '../store/datasets-images';
 import { useDataBrowserStore } from '../store/data-browser';
@@ -20,7 +20,7 @@ export default defineComponent({
     SampleDataBrowser,
     ImageDataBrowser,
     PatientBrowser,
-    PatientList,
+    // PatientList,
   },
   setup() {
     const dicomStore = useDICOMStore();
@@ -138,7 +138,7 @@ export default defineComponent({
           </v-expansion-panel-text>
         </v-expansion-panel>
 
-        <v-expansion-panel v-if="dicomWeb.isConfigured" :value="DICOM_WEB_KEY">
+        <!-- <v-expansion-panel v-if="dicomWeb.isConfigured" :value="DICOM_WEB_KEY">
           <v-expansion-panel-title>
             <v-icon class="collection-header-icon">mdi-cloud-download</v-icon>
             <span class="text-truncate">
@@ -148,7 +148,7 @@ export default defineComponent({
           <v-expansion-panel-text>
             <patient-list />
           </v-expansion-panel-text>
-        </v-expansion-panel>
+        </v-expansion-panel> -->
 
         <v-expansion-panel v-if="!hideSampleData" :value="SAMPLE_DATA_KEY">
           <v-expansion-panel-title>

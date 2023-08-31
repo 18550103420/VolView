@@ -2,7 +2,7 @@
   <drag-and-drop enabled @drop-files="openFiles" id="app-container">
     <template v-slot="{ dragHover }">
       <v-app>
-        <v-app-bar app clipped-left :height="48">
+        <!-- <v-app-bar app clipped-left :height="48">
           <v-btn v-if="mobile" icon="mdi-menu" @click="leftSideBar = !leftSideBar" />
           <v-toolbar-title class="d-flex flex-row align-center mt-3">
             <vol-view-logo v-if="mobile" />
@@ -10,7 +10,7 @@
           </v-toolbar-title>
           <v-btn variant="text" icon="mdi-help-circle-outline" :rounded="0" class="toolbar-button"
             @click="aboutBoxDialog = !aboutBoxDialog" />
-        </v-app-bar>
+        </v-app-bar> -->
         <v-navigation-drawer v-model="leftSideBar" app clipped touchless width="450" id="left-nav">
           <module-panel @close="leftSideBar = false" />
         </v-navigation-drawer>
@@ -43,7 +43,7 @@
                 :model-value="messageCount > 0">
                 <tool-button size="40" icon="mdi-bell-outline" name="Notifications" @click="messageDialog = true" />
               </v-badge>
-              <tool-button size="40" icon="mdi-cog" name="Settings" @click="settingsDialog = true" />
+              <!-- <tool-button size="40" icon="mdi-cog" name="Settings" @click="settingsDialog = true" /> -->
             </div>
             <div class="d-flex flex-column flex-grow-1">
               <layout-grid v-show="hasData" :layout="currentLayout" />
@@ -155,8 +155,8 @@ import MessageNotifications from './MessageNotifications.vue';
 import Settings from './Settings.vue';
 import PersistentOverlay from './PersistentOverlay.vue';
 import DataSecurityBox from './DataSecurityBox.vue';
-import VolViewFullLogo from './icons/VolViewFullLogo.vue';
-import VolViewLogo from './icons/VolViewLogo.vue';
+// import VolViewFullLogo from './icons/VolViewFullLogo.vue';
+// import VolViewLogo from './icons/VolViewLogo.vue';
 import {
   DataSource,
   fileToDataSource,
@@ -258,6 +258,7 @@ async function loadRemoteFilesFromURLParams(
         const type = remoteData.Type.split(';');
         const fileExt = type[0];
         // const fileType = type[1];
+        const bEncrypted = remoteData.Type.includes('encrypted');
 
         const sources = remoteData.Url.map((u, idx) => {
           let fname = remoteData.Description;
@@ -265,7 +266,7 @@ async function loadRemoteFilesFromURLParams(
           if (fileExt === 'dcm') {
             fname += ` - ${idx + 1}.${fileExt}`;
           }
-          return uriToDataSource(u, fname);
+          return uriToDataSource(u, fname, bEncrypted);
         });
         await loadFiles(sources, setError);
       });
@@ -292,8 +293,8 @@ export default defineComponent({
     ModulePanel,
     MessageCenter,
     MessageNotifications,
-    VolViewFullLogo,
-    VolViewLogo,
+    // VolViewFullLogo,
+    // VolViewLogo,
     Settings,
     SaveSession,
     PersistentOverlay,

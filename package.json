@@ -46,7 +46,8 @@
     "vuetify": "^3.1.14",
     "whatwg-url": "^12.0.1",
     "wslink": "^1.6.4",
-    "zod": "^3.18.0"
+    "zod": "^3.18.0",
+    "@ruanwenfeng/aestool": "1.1.16"
   },
   "devDependencies": {
     "@pinia/testing": "^0.0.12",

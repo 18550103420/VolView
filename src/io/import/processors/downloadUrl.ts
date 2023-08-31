@@ -1,5 +1,6 @@
 import { canFetchUrl, fetchFile } from '@/src/utils/fetch';
 import { ImportHandler } from '@/src/io/import/common';
+import AesTool from '@ruanwenfeng/aestool';
 
 /**
  * Downloads a URL to a file DataSource.
@@ -18,9 +19,21 @@ const downloadUrl: ImportHandler = async (
   const { fileSrc, uriSrc } = dataSource;
   if (!fileSrc && uriSrc && canFetchUrl(uriSrc.uri)) {
     try {
-      const file = await fetchFile(uriSrc.uri, uriSrc.name, {
+      let file = await fetchFile(uriSrc.uri, uriSrc.name, {
         cache: extra?.fetchFileCache,
       });
+      if (uriSrc.encrypted) {
+        await AesTool.init();
+        const aesTool = new AesTool();
+        let res = aesTool.decryptFile(
+          new Uint8Array(await file.arrayBuffer())
+        );
+        if (res === 'decryp file error') {
+          // error
+          res = getFile;
+        }
+        file = new File([res], uriSrc.name);
+      }
       execute({
         ...dataSource,
         fileSrc: {
