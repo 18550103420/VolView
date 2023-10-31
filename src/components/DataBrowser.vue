@@ -1,6 +1,5 @@
 <script lang="ts">
 import { computed, defineComponent, ref, watch } from 'vue';
-import SampleDataBrowser from './SampleDataBrowser.vue';
 import { useDicomWebStore } from '../store/dicom-web/dicom-web-store';
 import ImageDataBrowser from './ImageDataBrowser.vue';
 import PatientBrowser from './PatientBrowser.vue';
@@ -17,7 +16,6 @@ const DICOM_WEB_KEY = 'dicomWeb';
 export default defineComponent({
   name: 'DataBrowser',
   components: {
-    SampleDataBrowser,
     ImageDataBrowser,
     PatientBrowser,
     // PatientList,
@@ -150,7 +148,7 @@ export default defineComponent({
           </v-expansion-panel-text>
         </v-expansion-panel> -->
 
-        <v-expansion-panel v-if="!hideSampleData" :value="SAMPLE_DATA_KEY">
+        <!-- <v-expansion-panel v-if="!hideSampleData" :value="SAMPLE_DATA_KEY">
           <v-expansion-panel-title>
             <v-icon class="collection-header-icon">mdi-card-bulleted</v-icon>
             <span>Sample Data</span>
@@ -158,7 +156,7 @@ export default defineComponent({
           <v-expansion-panel-text>
             <sample-data-browser />
           </v-expansion-panel-text>
-        </v-expansion-panel>
+        </v-expansion-panel> -->
       </v-expansion-panels>
       <div class="empty-state ma-4 text-center">No data loaded</div>
     </div>

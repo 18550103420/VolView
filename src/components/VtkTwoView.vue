@@ -453,11 +453,14 @@ export default defineComponent({
 
         // TODO listen to changes in point data
         const range = imageData.getPointData().getScalars().getRange();
+        // console.log(range[0], range[1]);
         windowingStore.updateConfig(viewID.value, curImageID.value, {
           min: range[0],
           max: range[1],
+          level: 30,
+          width: 90,
         });
-        windowingStore.resetWindowLevel(viewID.value, curImageID.value);
+        // windowingStore.resetWindowLevel(viewID.value, curImageID.value);
       },
       {
         immediate: true,

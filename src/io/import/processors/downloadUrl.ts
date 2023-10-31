@@ -25,14 +25,15 @@ const downloadUrl: ImportHandler = async (
       if (uriSrc.encrypted) {
         await AesTool.init();
         const aesTool = new AesTool();
-        let res = aesTool.decryptFile(
+        const res = aesTool.decryptFile(
           new Uint8Array(await file.arrayBuffer())
         );
-        if (res === 'decryp file error') {
+        if (res.toString() !== 'decryp file error') {
+          file = new File([res], uriSrc.name);
+        } else {
           // error
-          res = getFile;
+          throw new Error(`ERROR ${res.toString()}`);
         }
-        file = new File([res], uriSrc.name);
       }
       execute({
         ...dataSource,

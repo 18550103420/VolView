@@ -5,7 +5,7 @@ import CTAHeadThumbnail from '@/src/assets/samples/CTA-Head_and_Neck.jpg';
 import USFetusThumbnail from '@/src/assets/samples/3DUS-Fetus.jpg';
 import { Layout, LayoutDirection } from './types/layout';
 import { ViewSpec } from './types/views';
-import { SampleDataset } from './types';
+import { SampleDataset, Wwwl } from './types';
 
 /**
  * These are the initial view IDs.
@@ -61,7 +61,7 @@ export const DefaultViewSpec = InitViewSpecs[InitViewIDs.Axial];
  */
 export const Layouts: Record<string, Layout> = [
   {
-    name: 'Axial Only',
+    name: 'Axial',
     direction: LayoutDirection.H,
     items: [InitViewIDs.Axial],
   },
@@ -72,37 +72,37 @@ export const Layouts: Record<string, Layout> = [
       InitViewIDs.Axial,
       {
         direction: LayoutDirection.H,
-        items: [InitViewIDs.Three, InitViewIDs.Coronal, InitViewIDs.Sagittal],
+        items: [InitViewIDs.Coronal, InitViewIDs.Sagittal],
       },
     ],
   },
+  // {
+  //   name: '3D Primary',
+  //   direction: LayoutDirection.V,
+  //   items: [
+  //     InitViewIDs.Three,
+  //     {
+  //       direction: LayoutDirection.H,
+  //       items: [InitViewIDs.Coronal, InitViewIDs.Sagittal, InitViewIDs.Axial],
+  //     },
+  //   ],
+  // },
+  // {
+  //   name: 'Quad View',
+  //   direction: LayoutDirection.H,
+  //   items: [
+  //     {
+  //       direction: LayoutDirection.V,
+  //       items: [InitViewIDs.Coronal, InitViewIDs.Three],
+  //     },
+  //     {
+  //       direction: LayoutDirection.V,
+  //       items: [InitViewIDs.Sagittal, InitViewIDs.Axial],
+  //     },
+  //   ],
+  // },
   {
-    name: '3D Primary',
-    direction: LayoutDirection.V,
-    items: [
-      InitViewIDs.Three,
-      {
-        direction: LayoutDirection.H,
-        items: [InitViewIDs.Coronal, InitViewIDs.Sagittal, InitViewIDs.Axial],
-      },
-    ],
-  },
-  {
-    name: 'Quad View',
-    direction: LayoutDirection.H,
-    items: [
-      {
-        direction: LayoutDirection.V,
-        items: [InitViewIDs.Coronal, InitViewIDs.Three],
-      },
-      {
-        direction: LayoutDirection.V,
-        items: [InitViewIDs.Sagittal, InitViewIDs.Axial],
-      },
-    ],
-  },
-  {
-    name: '3D Only',
+    name: '3D',
     direction: LayoutDirection.H,
     items: [InitViewIDs.Three],
   },
@@ -110,9 +110,49 @@ export const Layouts: Record<string, Layout> = [
   return { ...layouts, [layout.name]: layout };
 }, {});
 
+export const WwwlPresets: Record<string, Wwwl> = [
+  {
+    name: 'CT Brain',
+    wl: 30,
+    ww: 90,
+  },
+  {
+    name: 'CT Angio',
+    wl: 300,
+    ww: 600,
+  },
+  {
+    name: 'CT Narrow',
+    wl: 30,
+    ww: 30,
+  },
+  {
+    name: 'CT Bone',
+    wl: 300,
+    ww: 1500,
+  },
+  {
+    name: 'CT Chest',
+    wl: 50,
+    ww: 400,
+  },
+  {
+    name: 'CT Lungs',
+    wl: -400,
+    ww: 1500,
+  },
+  {
+    name: 'DSA',
+    wl: 512,
+    ww: 1024,
+  }
+].reduce((wwwlPresets, wwwl) => {
+  return { ...wwwlPresets, [wwwl.name]: wwwl };
+}, {});
+
 export const LABELMAP_PALETTE = {
   0: [0, 0, 0, 0], // eraser
-  1: [153, 153, 0, 255],
+  1: [255, 0, 0, 255],
   2: [76, 76, 0, 255],
   3: [255, 255, 0, 255],
   4: [0, 76, 0, 255],
@@ -120,7 +160,7 @@ export const LABELMAP_PALETTE = {
   6: [0, 255, 0, 255],
   7: [76, 0, 0, 255],
   8: [153, 0, 0, 255],
-  9: [255, 0, 0, 255],
+  9: [153, 153, 0, 255],
   10: [0, 76, 76, 255],
   11: [0, 153, 153, 255],
   12: [0, 255, 255, 255],

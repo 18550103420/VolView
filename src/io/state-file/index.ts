@@ -6,6 +6,7 @@ import { useToolStore } from '@/src/store/tools';
 import { Tools } from '@/src/store/tools/types';
 import { useViewStore } from '@/src/store/views';
 import { LayoutDirection } from '@/src/types/layout';
+import { usePaintToolStore } from '@/src/store/tools/paint';
 import { Manifest } from './schema';
 
 import { retypeFile } from '../io';
@@ -13,6 +14,10 @@ import { ARCHIVE_FILE_TYPES } from '../mimeTypes';
 
 export const MANIFEST = 'manifest.json';
 export const MANIFEST_VERSION = '2.1.0';
+
+export function serializeForFData() {
+  return useLabelmapStore().serializeForFData(usePaintToolStore().activeLabelmapID);
+}
 
 export async function serialize() {
   const datasetStore = useDatasetStore();

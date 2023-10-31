@@ -26,3 +26,9 @@ export type PartialWithRequired<T, K extends keyof T> = Pick<T, K> &
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
 export type ValueOf<T> = T[keyof T];
+
+export type Wwwl = {
+  name: string;
+  ww: number;
+  wl:number;
+}

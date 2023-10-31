@@ -46,11 +46,13 @@ describe('serializeDataSource', () => {
       uriSrc: {
         uri: 'https://example.com/image.jpg',
         name: 'image.jpg',
+        encrypted: false,
       },
       parent: {
         uriSrc: {
           uri: 's3://example/bucket',
           name: '',
+          encrypted: false,
         },
       },
     };
@@ -77,6 +79,7 @@ describe('serializeDataSource', () => {
           uriSrc: {
             uri: 'https://example.com/archive.zip',
             name: 'archive.zip',
+            encrypted: false,
           },
         },
       },

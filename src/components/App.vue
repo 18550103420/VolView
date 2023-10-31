@@ -19,7 +19,7 @@
             <div id="tools-strip" class="bg-grey-darken-4 d-flex flex-column align-center">
               <tool-button size="40" icon="mdi-folder-open" name="Open files" @click="userPromptFiles" />
               <tool-button size="40" icon="mdi-content-save-all" name="Save session" :loading="saveHappening"
-                @click="handleSave" />
+                @click="handleSaveToFData" />
               <div class="my-1 tool-separator" />
               <v-menu location="right" :close-on-content-click="false">
                 <template v-slot:activator="{ props }">
@@ -143,6 +143,7 @@ import {
   ImportDataSourcesResult,
   convertSuccessResultToDataSelection,
 } from '@/src/io/import/importDataSources';
+import { ParallelHasher } from 'ts-md5';
 import ToolButton from './ToolButton.vue';
 import LayoutGrid from './LayoutGrid.vue';
 import ModulePanel from './ModulePanel.vue';
@@ -161,13 +162,14 @@ import {
   DataSource,
   fileToDataSource,
   getDataSourceName,
-  uriToDataSource,
+  neuroInputToDataSource,
+  // uriToDataSource,
 } from '../io/import/dataSource';
 import { useImageStore } from '../store/datasets-images';
 import { useViewStore } from '../store/views';
 import { MessageType, useMessageStore } from '../store/messages';
 import { Layouts } from '../config';
-import { serialize } from '../io/state-file';
+import { serialize, serializeForFData } from '../io/state-file';
 import SaveSession from './SaveSession.vue';
 import { useGlobalErrorHook } from '../composables/useGlobalErrorHook';
 import { useWebGLWatchdog } from '../composables/useWebGLWatchdog';
@@ -181,6 +183,9 @@ import { useKeyboardShortcuts } from '../composables/useKeyboardShortcuts';
 // } from '../utils/errorReporting';
 // import { resolveBaseUrl } from 'vite';
 import { InputJsondata } from '../types/inputJson'
+import { uploadToFDataStore } from '../store/uploadToFData';
+// import { DatasetType } from '../io/state-file/schema';
+// import { Md52 } from 'spark-md5';
 
 async function loadFiles(
   sources: DataSource[],
@@ -246,6 +251,7 @@ async function loadRemoteFilesFromURLParams(
   try {
     fetch(url).then((response) => {
       if (response.status === 200) {
+        uploadToFDataStore().setBaseUrl(new URL(url, window.location.origin).origin);
         return response.json();
       }
       const failedError = new Error(
@@ -253,23 +259,8 @@ async function loadRemoteFilesFromURLParams(
       );
       return setError(failedError);
     }).then((remoteJson: Array<InputJsondata>) => {
-      remoteJson.forEach(async (remoteData: InputJsondata) => {
-        // console.log(remoteData)
-        const type = remoteData.Type.split(';');
-        const fileExt = type[0];
-        // const fileType = type[1];
-        const bEncrypted = remoteData.Type.includes('encrypted');
-
-        const sources = remoteData.Url.map((u, idx) => {
-          let fname = remoteData.Description;
-
-          if (fileExt === 'dcm') {
-            fname += ` - ${idx + 1}.${fileExt}`;
-          }
-          return uriToDataSource(u, fname, bEncrypted);
-        });
-        await loadFiles(sources, setError);
-      });
+      // console.log(remoteJson);
+      loadFiles(new Array(neuroInputToDataSource(remoteJson)), setError);
     });
   } catch (err) {
     const failedError = new Error(
@@ -278,6 +269,7 @@ async function loadRemoteFilesFromURLParams(
     setError(failedError);
   }
 }
+
 
 export default defineComponent({
   name: 'App',
@@ -313,7 +305,7 @@ export default defineComponent({
 
     // --- layout --- //
 
-    const layoutName: Ref<string> = ref('Quad View');
+    const layoutName: Ref<string> = ref('Axial Primary');
     const { layout: currentLayout } = storeToRefs(viewStore);
 
     watch(
@@ -453,6 +445,49 @@ export default defineComponent({
       }
     };
 
+    const handleSaveToFData = async () => {
+      const uploadInfo = uploadToFDataStore().getInfo();
+      if (uploadInfo.baseUrl) {
+        const uploadUrl = `${uploadInfo.baseUrl}/apiv1/dicom/label`
+        try {
+          saveHappening.value = true;
+          const imgFile = await serializeForFData();
+          console.log(imgFile);
+
+          if (imgFile) {
+            const hasher = new ParallelHasher('md5_worker.js');
+            hasher.hash(imgFile).then(async (e:any) => {
+              // console.log('md5 of imgFile is', e);
+
+              const param = new FormData();
+              param.append('Md5', e);
+              param.append('File', imgFile);
+              param.append('PkSubjectData', uploadInfo.pk);
+              param.append('FileName', (imgFile as File).name);
+              param.append('Ext', 'nii.gz');
+
+              const saveResult = await fetch(uploadUrl, {
+                method: 'POST',
+                body: param,
+              });
+              if (saveResult.ok) messageStore.addSuccess('Save Successful');
+              else messageStore.addError('Save Failed', 'Network response not OK');
+            });
+          }
+
+        } catch (error) {
+          messageStore.addError(
+            'Save Failed with error',
+            `Failed from: ${error}`
+          );
+        } finally {
+          saveHappening.value = false;
+        }
+      } else {
+        saveDialog.value = true;
+      }
+    };
+
     const display = useDisplay();
 
     return {
@@ -462,6 +497,7 @@ export default defineComponent({
       dataSecurityDialog: ref(false),
       saveDialog,
       handleSave,
+      handleSaveToFData,
       saveHappening,
       leftSideBar: ref(!display.mobile.value),
       mobile: display.mobile,

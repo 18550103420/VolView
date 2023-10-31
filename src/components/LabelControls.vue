@@ -47,13 +47,13 @@ watchEffect(() => {
             v-for="[id, { labelName, color }] in labels"
             :key="id"
           >
-            <v-item v-slot="{ selectedClass, toggle }">
+            <v-item v-slot="{ selectedClass }">
               <v-chip
                 variant="tonal"
                 :class="['w-100 d-flex', selectedClass]"
                 @click="
                   () => {
-                    toggle();
+                    // toggle();
                     labelsStore.setActiveLabel(id);
                   }
                 "

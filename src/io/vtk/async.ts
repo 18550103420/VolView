@@ -60,3 +60,5 @@ export const stlReader = runAsyncVTKReader('stl');
 export const vtiReader = runAsyncVTKReader('vti');
 export const vtpReader = runAsyncVTKReader('vtp');
 export const vtiWriter = runAsyncVTKWriter('vti');
+export const niiReader = runAsyncVTKReader('nii.gz');
+export const niiWriter = runAsyncVTKWriter('nii.gz');

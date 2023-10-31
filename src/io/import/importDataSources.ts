@@ -5,15 +5,16 @@ import handleDicomFile from '@/src/io/import/processors/handleDicomFile';
 import downloadUrl from '@/src/io/import/processors/downloadUrl';
 import extractArchive from '@/src/io/import/processors/extractArchive';
 import extractArchiveTargetFromCache from '@/src/io/import/processors/extractArchiveTarget';
-import handleAmazonS3 from '@/src/io/import/processors/handleAmazonS3';
-import handleGoogleCloudStorage from '@/src/io/import/processors/handleGoogleCloudStorage';
+// import handleAmazonS3 from '@/src/io/import/processors/handleAmazonS3';
+// import handleGoogleCloudStorage from '@/src/io/import/processors/handleGoogleCloudStorage';
 import importSingleFile from '@/src/io/import/processors/importSingleFile';
 import handleRemoteManifest from '@/src/io/import/processors/remoteManifest';
-import restoreStateFile from '@/src/io/import/processors/restoreStateFile';
+// import restoreStateFile from '@/src/io/import/processors/restoreStateFile';
 import updateFileMimeType from '@/src/io/import/processors/updateFileMimeType';
 import handleConfig from '@/src/io/import/processors/handleConfig';
 import { useDICOMStore } from '@/src/store/datasets-dicom';
 import { makeDICOMSelection, makeImageSelection } from '@/src/store/datasets';
+import handleNeuroblemInput from '@/src/io/import/processors/handleNeuroblemInput';
 
 export type ImportDataSourcesResult = PipelineResult<DataSource, ImportResult>;
 
@@ -29,6 +30,7 @@ export function convertSuccessResultToDataSelection(
     return null;
   }
 
+  console.log(`dataType:${dataType}`);
   if (dataType === 'dicom') {
     return makeDICOMSelection(dataID);
   }
@@ -59,14 +61,15 @@ const unhandledResource: ImportHandler = () => {
 
 export async function importDataSources(dataSources: DataSource[]) {
   const middleware: Array<ImportHandler> = [
+    handleNeuroblemInput,
     // updating the file type should be first in the pipeline
     updateFileMimeType,
     // handleConfig must before restoreStateFile for label props to be applied to deserialized tools
     handleConfig,
-    restoreStateFile,
+    // restoreStateFile,
     handleRemoteManifest,
-    handleGoogleCloudStorage,
-    handleAmazonS3,
+    // handleGoogleCloudStorage,
+    // handleAmazonS3,
     downloadUrl,
     extractArchiveTargetFromCache,
     extractArchive,

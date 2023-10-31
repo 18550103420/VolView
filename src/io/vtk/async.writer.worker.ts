@@ -6,10 +6,15 @@ import vtkLabelMap from '@/src/vtk/LabelMap';
 import vtk from '@kitware/vtk.js/vtk';
 
 import { writeData, StateObject } from './common';
+// import vtkITKHelper from '@kitware/vtk.js/Common/DataModel/ITKHelper';
 
 const Writers = {
-  vti: {
+  'vti': {
     writerClass: vtkXMLImageDataWriter,
+  },
+  'nii.gz': {
+    writerClass: vtkXMLImageDataWriter,
+    // writerClass: vtkITKHelper.convertVtkToItkImage,
   },
 };
 

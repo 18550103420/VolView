@@ -7,6 +7,7 @@ import { RULER_LABEL_DEFAULTS } from '@/src/config';
 import { Manifest, StateFile } from '@/src/io/state-file/schema';
 
 import { useAnnotationTool } from './useAnnotationTool';
+// import { ComputedRefSymbol, RefSymbol } from '@vue/reactivity';
 
 const rulerDefaults = () => ({
   firstPoint: [0, 0, 0] as Vector3,
@@ -41,12 +42,15 @@ export const useRulerStore = defineStore('ruler', () => {
     deserialize: deserializeTool,
   } = annotationTool;
 
+  // const calibration = ref<number>(1);
+
   const lengthByID = computed<Record<string, number>>(() => {
     const byID = rulerByID.value;
     return rulerIDs.value.reduce((lengths, id) => {
       const { firstPoint, secondPoint } = byID[id];
       return Object.assign(lengths, {
-        [id]: Math.sqrt(distance2BetweenPoints(firstPoint, secondPoint)),
+        // [id]: calibration.value * Math.sqrt(distance2BetweenPoints(firstPoint, secondPoint)),
+        [id]: annotationTool.getCalibration() * Math.sqrt(distance2BetweenPoints(firstPoint, secondPoint)),
       });
     }, {});
   });

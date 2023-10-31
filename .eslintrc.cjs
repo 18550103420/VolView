@@ -21,6 +21,7 @@ module.exports = {
     'src/io/itk-dicom/emscripten-build/**',
     'src/io/resample/emscripten-build/**',
     '**/*.d.ts',
+    'public/md5_worker.js'
   ],
 
   globals: {
@@ -35,6 +36,7 @@ module.exports = {
     'import/prefer-default-export': 'off',
     'no-plusplus': 'off',
     'no-underscore-dangle': 'off',
+    "no-await-in-loop": "off",
     'import/extensions': [
       'error',
       'ignorePackages',

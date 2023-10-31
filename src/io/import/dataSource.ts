@@ -1,5 +1,16 @@
 import { Maybe } from '@/src/types';
 
+import { InputJsondata } from '../../types/inputJson'
+/**
+ * Represents a neuroblem data source with a file name for the downloaded resource.
+ *
+ * This can optionally be paired with a FileSource, indicating that the
+ * FileSource is a remote FileSource.
+ */
+export interface NeuroblemDataSource {
+  resources: Array<InputJsondata>
+}
+
 /**
  * Represents a URI source with a file name for the downloaded resource.
  *
@@ -56,6 +67,7 @@ export interface DicomSource {
  * - { dicomSrc }: a list of dicom data sources.
  */
 export interface DataSource {
+  neuroSrc?: NeuroblemDataSource;
   fileSrc?: FileSource;
   uriSrc?: UriSource;
   archiveSrc?: ArchiveSource;
@@ -74,6 +86,17 @@ export const fileToDataSource = (file: File): DataSource => ({
   fileSrc: {
     file,
     fileType: file.type,
+  },
+});
+
+/**
+ * Creates a DataSource from neuroblem input.
+ * @param jsonData
+ * @returns
+ */
+export const neuroInputToDataSource = (jsonData: Array<InputJsondata>): DataSource => ({
+  neuroSrc: {
+    resources: jsonData
   },
 });
 

@@ -8,6 +8,7 @@ import {
 } from '@itk-wasm/dicom';
 
 import itkConfig from '@/src/io/itk/itkConfig';
+// import { record } from 'zod';
 
 export interface TagSpec {
   name: string;
@@ -140,8 +141,33 @@ export class DICOMIO {
       (result.outputs[0].data as TextStream).data
     ) as VolumesToFileNamesMap;
 
+    // Check NumberOfFrame
+    const vtfi:VolumesToFileNamesMap = {};
+
+    // const promises = 
+    await Promise.all(Object.entries(volumeToFileIndexes).map(async ([vkey, fileIndexes]) => {
+      // console.log(`vkey:${vkey}`);
+      const nofTag = await this.readTags(sanitizeFile(files[parseInt(fileIndexes[0], 10)]),
+        [{ name: 'NumberOfFrame', tag: '0028|0008', strconv: true }]);
+      if (nofTag.NumberOfFrame.length > 0) {
+        // console.log(`NumberOfFrame:${nofTag.NumberOfFrame}`);
+        
+        if (fileIndexes.length > 0) {
+          fileIndexes.forEach(idx => {
+            vtfi[vkey + idx] = [idx];
+          })
+        }
+      } else {
+        vtfi[vkey] = fileIndexes;
+      }
+    }));
+
+    // for (const p of promises) {
+    //   await p;
+    // }
+
     const volumeToFiles = Object.fromEntries(
-      Object.entries(volumeToFileIndexes).map(([volumeKey, fileIndexes]) => [
+      Object.entries(vtfi).map(([volumeKey, fileIndexes]) => [
         volumeKey,
         // file indexes to Files
         fileIndexes.map((fileIndex) => files[parseInt(fileIndex, 10)]),

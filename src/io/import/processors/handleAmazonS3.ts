@@ -10,6 +10,7 @@ const handleAmazonS3: ImportHandler = async (dataSource, { execute, done }) => {
           uriSrc: {
             uri: url,
             name,
+            encrypted: false,
           },
           parent: dataSource,
         });

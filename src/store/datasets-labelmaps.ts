@@ -4,12 +4,18 @@ import { defineStore } from 'pinia';
 import { useImageStore } from '@/src/store/datasets-images';
 import { join, normalize } from '@/src/utils/path';
 import { useIdStore } from '@/src/store/id';
+import vtkITKHelper from '@kitware/vtk.js/Common/DataModel/ITKHelper';
+import { writeImageArrayBuffer } from 'itk-wasm'
 import vtkLabelMap from '../vtk/LabelMap';
 import { LABELMAP_PALETTE } from '../config';
 import { StateFile, Manifest } from '../io/state-file/schema';
 import { vtiReader, vtiWriter } from '../io/vtk/async';
+import { FILE_READERS } from '../io';
 import { FileEntry } from '../io/types';
 import { findImageID, getDataID } from './datasets';
+// import writeImageArrayBuffer from '../io/itk/writeImageArrayBuffer';
+// import { usePaintToolStore } from './tools/paint';
+import { uploadToFDataStore } from './uploadToFData';
 
 const LabelmapArrayType = Uint8Array;
 export type LabelmapArrayType = Uint8Array;
@@ -136,6 +142,72 @@ export const useLabelmapStore = defineStore('labelmap', {
       });
 
       return labelmapIDMap;
+    },
+    
+    async serializeForFData(activeLabelmapID: String | null) {
+      let file;
+      await Promise.all(
+        Object.entries(this.labelmaps).map(async ([id, labelMap]) => {
+          // const serializedData = await niiWriter(labelMap);
+          // console.log(serializedData);
+          // if (id === usePaintToolStore().activeLabelmapID) {
+          if (id === activeLabelmapID) {
+            const uploadInfo = uploadToFDataStore().getInfo();
+            // let labelName = `${uploadInfo.labelName}_nxEdit.nii.gz`;
+            // const labelName = uploadInfo.labelName;
+            const image = vtkITKHelper.convertVtkToItkImage(labelMap)
+            image.data = image.data.slice(0);
+
+            const direction = labelMap.getDirection(); // Transpose the direction matrix from column-major to row-major
+
+            for (let idx = 0; idx < 3; ++idx) {
+              for (let idy = 0; idy < 3; ++idy) {
+                image.direction[idx + idy * 3] = direction[idx + idy * 3];
+              }
+            }
+            // console.log(image.direction);
+            await writeImageArrayBuffer(
+              null,
+              image,
+              uploadInfo.labelName
+            ).then((valueReturned) => {
+              const buffer = valueReturned.arrayBuffer;
+              const blob = new Blob([buffer]);
+              file = new File([blob], uploadInfo.labelName);
+              // console.log(file);
+            })
+          }
+        })
+      );
+      return file;
+    },
+    async deserializeForFData(
+      labelFile: File,
+      dataIDMap: Record<string, string>
+    ) {
+
+      // const labelmapIDMap: Record<string, string> = {};
+      const reader = FILE_READERS.get('application/gzip')!;
+      const dataObject = await reader(labelFile);
+      const labelMapObj = toLabelMap(dataObject as vtkImageData);
+
+      if (dataIDMap.nii && dataIDMap.nii.length) {
+        const id = useIdStore().nextId();
+        this.idList.push(id);
+        this.parentImage[id] = findImageID(dataIDMap.nii);
+        this.labelmaps[id] = labelMapObj;
+        // labelMapObj.setLabelColor(Number.parseInt(id), [255, 255, 0, 255]);
+        this.$proxies.addData(id, labelMapObj);
+      }
+      if (dataIDMap.dicom && dataIDMap.dicom.length) {
+        const id = useIdStore().nextId();
+        this.idList.push(id);
+        this.parentImage[id] = findImageID(dataIDMap.dicom);
+        this.labelmaps[id] = labelMapObj;
+        // labelMapObj.setLabelColor(Number.parseInt(id), [255, 255, 0, 255]);
+        this.$proxies.addData(id, labelMapObj);
+      }
+      // return labelmapIDMap;
     },
   },
 });

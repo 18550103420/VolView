@@ -67,4 +67,4 @@ export const MIME_TYPES = new Set(Object.values(FILE_EXT_TO_MIME));
 /**
  * Supported archives
  */
-export const ARCHIVE_FILE_TYPES = new Set(['application/zip'], ['application/gzip']);
+export const ARCHIVE_FILE_TYPES = new Set(['application/zip', 'application/gzip']);

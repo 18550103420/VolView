@@ -21,6 +21,7 @@ const handleRemoteManifest: ImportHandler = async (
           uriSrc: {
             uri: res.url,
             name: res.name ?? new URL(res.url).pathname,
+            encrypted: false,
           },
           parent: dataSource,
         });

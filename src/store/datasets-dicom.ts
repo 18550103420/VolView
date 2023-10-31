@@ -8,6 +8,8 @@ import { useFileStore } from './datasets-files';
 import { StateFile, DatasetType } from '../io/state-file/schema';
 import { serializeData } from '../io/state-file/utils';
 import { DICOMIO } from '../io/dicom';
+// import { object } from 'zod';
+// import { file } from 'jszip';
 
 export const ANONYMOUS_PATIENT = 'Anonymous';
 export const ANONYMOUS_PATIENT_ID = 'ANONYMOUS';
@@ -39,6 +41,7 @@ export interface StudyInfo {
 }
 
 export interface VolumeInfo {
+  NumberOfFrame: string;
   NumberOfSlices: number;
   VolumeID: string;
   Modality: string;
@@ -95,6 +98,7 @@ const readDicomTags = (dicomIO: DICOMIO, file: File) =>
     { name: 'SeriesInstanceUID', tag: '0020|000e' },
     { name: 'SeriesNumber', tag: '0020|0011' },
     { name: 'SeriesDescription', tag: '0008|103e', strconv: true },
+    { name: 'NumberOfFrame', tag: '0028|0008', strconv: true },
   ]);
 
 export const useDICOMStore = defineStore('dicom', {
@@ -142,6 +146,10 @@ export const useDICOMStore = defineStore('dicom', {
           // Read tags of first file
           if (!(volumeKey in this.volumeInfo)) {
             const tags = await readDicomTags(dicomIO, files[0]);
+
+            // if (tags.NumberOfFrame == "41") {
+            //   console.log(`FFFFNNNNAAAMMMMEEE:${files[0].name}`);
+            // }
             // TODO parse the raw string values
             const patient = {
               PatientID: tags.PatientID || ANONYMOUS_PATIENT_ID,
@@ -166,7 +174,8 @@ export const useDICOMStore = defineStore('dicom', {
                 'Modality',
                 'SeriesInstanceUID',
                 'SeriesNumber',
-                'SeriesDescription'
+                'SeriesDescription',
+                'NumberOfFrame'
               ),
               NumberOfSlices: files.length,
               VolumeID: volumeKey,
@@ -182,6 +191,54 @@ export const useDICOMStore = defineStore('dicom', {
           }
         })
       );
+      // const promises = Object.entries(volumeToFiles).map(async ([volumeKey, files]) => {
+      //   // Read tags of first file
+      //   if (!(volumeKey in this.volumeInfo)) {
+      //     const tags = await readDicomTags(dicomIO, files[0]);
+
+      //     // TODO parse the raw string values
+      //     const patient = {
+      //       PatientID: tags.PatientID || ANONYMOUS_PATIENT_ID,
+      //       PatientName: tags.PatientName || ANONYMOUS_PATIENT,
+      //       PatientBirthDate: tags.PatientBirthDate || '',
+      //       PatientSex: tags.PatientSex || '',
+      //     };
+
+      //     const study = pick(
+      //       tags,
+      //       'StudyID',
+      //       'StudyInstanceUID',
+      //       'StudyDate',
+      //       'StudyTime',
+      //       'AccessionNumber',
+      //       'StudyDescription'
+      //     );
+
+      //     const volumeInfo = {
+      //       ...pick(
+      //         tags,
+      //         'Modality',
+      //         'SeriesInstanceUID',
+      //         'SeriesNumber',
+      //         'SeriesDescription',
+      //         'NumberOfFrame'
+      //       ),
+      //       NumberOfSlices: files.length,
+      //       VolumeID: volumeKey,
+      //     };
+
+      //     this._updateDatabase(patient, study, volumeInfo);
+      //   }
+
+      //   // invalidate any existing volume
+      //   if (volumeKey in this.volumeToImageID) {
+      //     // buildVolume requestor uses this as a rebuild hint
+      //     this.needsRebuild[volumeKey] = true;
+      //   }
+      // })
+      // for (const p of promises) {
+      //   await p;
+      // }
 
       return Object.keys(volumeToFiles);
     },
@@ -326,7 +383,13 @@ export const useDICOMStore = defineStore('dicom', {
     // returns an ITK image object
     async getVolumeThumbnail(volumeKey: string) {
       const { NumberOfSlices } = this.volumeInfo[volumeKey];
+      // const { NumberOfSlices, NumberOfFrame } = this.volumeInfo[volumeKey];
+      // if (NumberOfFrame.length > 0) {
+      //   NumberOfSlices = parseInt(NumberOfFrame);
+      // }
       const middleSlice = Math.ceil(NumberOfSlices / 2);
+      // console.log(`volumeKey:${volumeKey}`)
+      // console.log(`NumberOfSlices:${NumberOfSlices},NumberOfFrame:${NumberOfFrame}`)
       return this.getVolumeSlice(volumeKey, middleSlice, true);
     },
 

@@ -16,6 +16,7 @@ const handleGoogleCloudStorage: ImportHandler = async (
           uriSrc: {
             uri: object.mediaLink,
             name: object.name,
+            encrypted: false,
           },
           parent: dataSource,
         });

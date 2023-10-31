@@ -1,9 +1,11 @@
 <script setup lang="ts" generic="ToolID extends string">
 /* global ToolID:readonly */
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useCurrentImage } from '@/src/composables/useCurrentImage';
 import { AnnotationToolStore } from '@/src/store/tools/useAnnotationTool';
 import { frameOfReferenceToImageSliceAndAxis } from '@/src/utils/frameOfReference';
+import CloseableDialog from '@/src/components/CloseableDialog.vue';
+import RulerCalibration from './RulerCalibration.vue';
 
 const props = defineProps<{
   toolStore: AnnotationToolStore<ToolID>;
@@ -36,9 +38,16 @@ const remove = (id: ToolID) => {
   props.toolStore.removeTool(id);
 };
 
-const jumpTo = (id: ToolID) => {
-  props.toolStore.jumpToTool(id);
+const calibrationDialog = ref(false);
+const rulerID = ref();
+
+const calibration = (id: ToolID, newLength: number) => {
+  props.toolStore.calibrationTool(id, newLength);
 };
+
+// const jumpTo = (id: ToolID) => {
+//   props.toolStore.jumpToTool(id);
+// };
 </script>
 
 <template>
@@ -60,7 +69,7 @@ const jumpTo = (id: ToolID) => {
       </slot>
     </v-list-item-subtitle>
     <template #append>
-      <v-btn
+      <!-- <v-btn
         class="mr-2"
         icon="mdi-target"
         variant="text"
@@ -68,6 +77,21 @@ const jumpTo = (id: ToolID) => {
       >
         <v-icon>mdi-target</v-icon>
         <v-tooltip location="top" activator="parent"> Reveal Slice </v-tooltip>
+      </v-btn> 
+     @click="calibration(tool.id)"
+    -->
+      <v-btn
+        icon="mdi-pencil-ruler" 
+        variant="text"
+        @click.stop="
+          () => {
+            rulerID = tool.id;
+            calibrationDialog = true;
+          }
+        "
+      >
+        <v-icon>mdi-pencil-ruler</v-icon>
+        <v-tooltip location="top" activator="parent">Calibration</v-tooltip>
       </v-btn>
       <v-btn icon="mdi-delete" variant="text" @click="remove(tool.id)">
         <v-icon>mdi-delete</v-icon>
@@ -75,6 +99,19 @@ const jumpTo = (id: ToolID) => {
       </v-btn>
     </template>
   </v-list-item>
+
+  <closeable-dialog v-model="calibrationDialog">
+    <template v-slot="{ close }">
+      <RulerCalibration
+        @done="(newLength) => {
+            calibration(rulerID, newLength);
+            close();
+          }
+        "
+        :id="rulerID"
+      />
+    </template>
+  </closeable-dialog>
 </template>
 
 <style src="@/src/components/styles/utils.css"></style>

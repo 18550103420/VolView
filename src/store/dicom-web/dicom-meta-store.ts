@@ -90,6 +90,7 @@ export const useDicomMetaStore = defineStore('dicom-meta', {
           'SeriesNumber',
           'SeriesDescription'
         ),
+        NumberOfFrame: '',
         NumberOfSlices: 0, // incremented later
         VolumeID: info.SeriesInstanceUID,
       };

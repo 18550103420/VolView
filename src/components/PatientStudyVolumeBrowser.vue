@@ -128,12 +128,15 @@ export default defineComponent({
     watch(
       volumeKeys,
       (keys) => {
+        // console.log(`volumeKeys change. keys:${keys.length}`);
         keys.forEach(async (key) => {
           const cacheKey = dicomCacheKey(key);
           if (cacheKey in thumbnailCache) {
+            // console.log(`key in chchekey.`)
             return;
           }
-
+          
+          thumbnailCache[cacheKey] = '';
           try {
             const thumb = await generateDICOMThumbnail(dicomStore, key);
             if (thumb !== null) {
@@ -230,8 +233,8 @@ export default defineComponent({
                 'mt-1': true,
                 'volume-card-active': active,
               }"
-              min-height="180px"
-              min-width="180px"
+              min-height="160px"
+              min-width="160px"
               :html-title="volume.info.SeriesDescription"
               @click="select"
             >
@@ -258,7 +261,7 @@ export default defineComponent({
                     <persistent-overlay>
                       <div class="d-flex flex-column fill-height">
                         <v-row no-gutters justify="end" align-content="start">
-                          <div class="layer-btn-container">
+                          <!-- <div class="layer-btn-container">
                             <v-btn
                               :disabled="!volume.layerable"
                               :loading="volume.loading"
@@ -272,7 +275,7 @@ export default defineComponent({
                                 {{ volume.layerTooltip }}
                               </v-tooltip>
                             </v-btn>
-                          </div>
+                          </div> -->
                           <v-checkbox
                             :key="volume.info.VolumeID"
                             :value="volume.key"
@@ -286,7 +289,7 @@ export default defineComponent({
                         <v-spacer />
                         <v-row no-gutters justify="start" align="end">
                           <div class="mb-1 ml-1 text-caption">
-                            [{{ volume.info.NumberOfSlices }}]
+                            [{{ volume.info.NumberOfFrame || volume.info.NumberOfSlices }}]
                           </div>
                         </v-row>
                       </div>

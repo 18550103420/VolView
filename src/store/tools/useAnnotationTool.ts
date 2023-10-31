@@ -12,6 +12,7 @@ import { LPSAxisDir } from '@/src/types/lps';
 import { AnnotationTool } from '@/src/types/annotation-tool';
 import { findImageID, getDataID } from '@/src/store/datasets';
 import { useIdStore } from '@/src/store/id';
+import { distance2BetweenPoints } from '@kitware/vtk.js/Common/Core/Math';
 import useViewSliceStore from '../view-configs/slicing';
 import { useLabels, Labels, Label } from './useLabels';
 
@@ -26,6 +27,8 @@ const makeAnnotationToolDefaults = () => ({
   color: TOOL_COLORS[0],
   name: 'baseAnnotationTool',
 });
+
+const calibration = ref<number>(1);
 
 // Must return addTool in consuming Pinia store.
 export const useAnnotationTool = <
@@ -94,6 +97,24 @@ export const useAnnotationTool = <
 
     removeFromArray(toolIDs.value, id);
     delete toolByID.value[id];
+  }
+
+  // const rulerStore = useRulerStore();
+  function calibrationTool(id: ToolID, newLength: number) {
+    if (!(id in toolByID.value)) return;
+
+    const byID = toolByID.value;
+    const { firstPoint, secondPoint } = byID[id];
+    const oldLength = Math.sqrt(distance2BetweenPoints(firstPoint, secondPoint));
+    if (oldLength > 0) {
+      calibration.value = newLength / oldLength;
+    } else {
+      throw new Error('The length of the original line needs to be greater than 0');
+    }
+  }
+
+  function getCalibration() {
+    return calibration.value;
   }
 
   function updateTool(id: ToolID, patch: ToolPatch) {
@@ -194,6 +215,8 @@ export const useAnnotationTool = <
     tools,
     addTool,
     removeTool,
+    calibrationTool,
+    getCalibration,
     updateTool,
     jumpToTool,
     activateTool,
